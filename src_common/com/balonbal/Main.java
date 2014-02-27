@@ -21,6 +21,8 @@ public class Main extends StateBasedGame {
 	
 	private static boolean debugging;
 	
+	private static ResourceManager rm;
+	
 	public Main(String name) {
 		
 		super(name);
@@ -44,6 +46,8 @@ public class Main extends StateBasedGame {
 	public static void main(String[] args) {
 		AppGameContainer container;
 		
+		rm = new ResourceManager();
+		
 		ConfigurationHandler ch = new ConfigurationHandler();
 		ch.initialize();
 		
@@ -66,7 +70,6 @@ public class Main extends StateBasedGame {
 	}
 	
 	public static void registerImages() {
-		ResourceManager rm = new ResourceManager();
 		rm.addImage(Strings.DEFAULT_IMAGE, Reference.DEFAULT_IMAGE);
 		
 		rm.addImage(Strings.PLAY_0, Reference.PLAY0);
@@ -75,6 +78,10 @@ public class Main extends StateBasedGame {
 		rm.addImage(Strings.OPTIONS_1, Reference.OPTIONS1);
 		rm.addImage(Strings.QUIT_0, Reference.QUIT0);
 		rm.addImage(Strings.QUIT_1, Reference.QUIT1);
+	}
+	
+	public static ResourceManager getResourceManager() {
+		return rm;
 	}
 
 }

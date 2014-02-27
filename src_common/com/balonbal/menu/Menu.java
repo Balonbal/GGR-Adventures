@@ -11,6 +11,7 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import com.balonbal.Main;
+import com.balonbal.core.ResourceManager;
 import com.balonbal.lib.Reference;
 import com.balonbal.lib.Strings;
 
@@ -27,6 +28,8 @@ public class Menu extends BasicGameState {
 	private Image playHighlight;
 	private Image optionsNoHighlight;
 	private Image optionsHighlight;
+	private Image quitNoHighlight;
+	private Image quitHighlight;
 	
 	//Debugging variables
 	private boolean debug = false;
@@ -40,13 +43,19 @@ public class Menu extends BasicGameState {
 	@Override
 	public void init(GameContainer container, StateBasedGame stateBasedGame) throws SlickException {
 		Main.registerImages();
+		
+		ResourceManager rm = Main.getResourceManager();
+		
 		selected = 0;
+		
 		width = container.getWidth();
 		height = container.getHeight();
-		playNoHighlight = new Image(Reference.PLAY0);
-		playHighlight = new Image(Reference.PLAY1);
-		optionsNoHighlight = new Image(Reference.OPTIONS0);
-		optionsHighlight = new Image(Reference.OPTIONS1);
+		playNoHighlight = rm.getImage(Strings.PLAY_0);
+		playHighlight = rm.getImage(Strings.PLAY_1);
+		optionsNoHighlight = rm.getImage(Strings.OPTIONS_0);
+		optionsHighlight = rm.getImage(Strings.OPTIONS_1);
+		quitNoHighlight = rm.getImage(Strings.QUIT_0);
+		quitHighlight = rm.getImage(Strings.QUIT_1);
 	}
 
 	@Override
@@ -55,22 +64,31 @@ public class Menu extends BasicGameState {
 		
 		Image play = null;
 		Image options = null;
+		Image quit = null;
 		
 		//Select image to display
 		switch(selected) {
 		case 0:
 			play = playHighlight;
 			options = optionsNoHighlight;
+			quit = quitNoHighlight;
 			break;
 		case 1:
 			play = playNoHighlight;
 			options = optionsHighlight;
+			quit = quitNoHighlight;
+			break;
+		case 2:
+			play = playNoHighlight;
+			options = optionsNoHighlight;
+			quit = quitHighlight;
 			break;
 		}
 		
 		//Draw images
 		graphics.drawImage(play, width/2 - play.getWidth()/2, (height/4));
-		graphics.drawImage(options, width/2 - options.getWidth()/2, height/7*3);
+		graphics.drawImage(options, width/2 - options.getWidth()/2, height/2-options.getHeight()/2);
+		graphics.drawImage(quit, width/2 - quit.getWidth()/2, height/4*3-quit.getHeight());
 		
 		//Draw debug information
 		if (debug) {
@@ -88,15 +106,27 @@ public class Menu extends BasicGameState {
 		mouseY = Mouse.getY();
 		if (input.isKeyPressed(Input.KEY_BACKSLASH)) {
 			Main.setDebugging(!debug);
-		} else if (input.isKeyPressed(Input.KEY_UP)) {
+		} else if (input.isKeyDown(Input.KEY_UP)) {
 			selected--;
 			if (selected < 0) {
-				selected = 1;
+				selected = 2;
 			}
-		} else if (input.isKeyPressed(Input.KEY_DOWN)) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else if (input.isKeyDown(Input.KEY_DOWN)) {
 			selected++;
-			if (selected > 1) {
+			if (selected > 2) {
 				selected = 0;
+			}
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		} else if (input.isKeyPressed(Input.KEY_ENTER)) {
 			switch(selected) {
@@ -105,6 +135,9 @@ public class Menu extends BasicGameState {
 				break;
 			case 1:
 				stateBasedGame.enterState(Reference.OPTIONS_STATE);
+				break;
+			case 2:
+				System.exit(0);
 				break;
 			}
 		}

@@ -3,7 +3,6 @@ package com.balonbal.core;
 import java.util.Hashtable;
 
 import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
 
 public class ResourceManager {
 	
@@ -11,7 +10,8 @@ public class ResourceManager {
 	
 	public Image getImage(String key) {
 		if (images.containsKey(key)) {
-			return images.get(key); //If the requested image is registered, return it
+			Image r = images.get(key); //If the requested image is registered, return it
+			return r;
 		} else {
 			return images.get("default"); //If not, use the default image
 		}
