@@ -6,6 +6,7 @@ public class Settings {
 	public static boolean fullscreen;
 	public static int width;
 	public static int height;
+	public static int framerate;
 	
 	//Default display options
 	public static final boolean FULLSCREEN_DEFAULT = false;
@@ -19,6 +20,7 @@ public class Settings {
 		600,
 		1080
 	};
+	public static final int FRAMERATE_DEFAULT = -1;
 	
 	//Key bindings A 
 	

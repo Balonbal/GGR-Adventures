@@ -22,7 +22,7 @@ public class ResourceManager {
 			Image img = new Image(imageLocation);
 			addImage(key, img);
 		} catch (Exception e) {
-			System.out.println("Unable to add image "+key+ " @ "+imageLocation);
+			Logger.log("SEVERE", "Unable to add image "+key+ " @ "+imageLocation);
 		}
 		
 	}

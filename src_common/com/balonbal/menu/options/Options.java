@@ -1,8 +1,8 @@
 package com.balonbal.menu.options;
 
 import java.awt.Font;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
@@ -30,7 +30,7 @@ public class Options extends BasicGameState {
 	private int height;
 	private byte selectedHeader;
 	private String selectedItem;
-	List<Hashtable<String, String>> tables;
+	protected List<HashMap<String, String>> tables;
 	
 	//Fonts
 	private TrueTypeFont header;
@@ -48,7 +48,11 @@ public class Options extends BasicGameState {
 	}
 
 	@Override
-	public void init(GameContainer arg0, StateBasedGame arg1) throws SlickException {
+	public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws SlickException {
+		
+		//Get the dimensions for the screen
+		width = gameContainer.getWidth();
+		height = gameContainer.getHeight();
 		
 		//Set up the fonts we are going to use
 		Font header = new Font("Verdana", Font.BOLD, 50);
@@ -57,17 +61,20 @@ public class Options extends BasicGameState {
 		this.item = new TrueTypeFont(item, true);
 		
 		//Add the settings panels
-		tables = new ArrayList<Hashtable<String, String>>();
+		tables = new ArrayList<HashMap<String, String>>();
 		
 		//Hashtable for video settings
-		Hashtable<String, String> video = new Hashtable<String, String>();
+		HashMap<String, String> video = new HashMap<String, String>();
 		video.put("header", "VIDEO");
 		video.put(Strings.FULLSCREEN_SETTING_STRING, "" + Settings.fullscreen);
 		video.put("Aspect ratio", Settings.width + "x" + Settings.height);
+		video.put("Frames per second", "" + Settings.framerate);
 		
-		//Hashtable for keybinds
-		Hashtable<String, String> keybinds = new Hashtable<String, String>();
+		//Hashtable for key bindings
+		HashMap<String, String> keybinds = new HashMap<String, String>();
+		keybinds.put("header", "KEYBINDS");
 		keybinds.put(Strings.KEYBINDS_A_ENABLED, "" + Settings.enabled_a);
+		keybinds.put(Strings.KEYBIND_A_ATTACK, Settings.attack_a);
 		
 		tables.add(video);
 		tables.add(keybinds);
@@ -76,11 +83,15 @@ public class Options extends BasicGameState {
 	@Override
 	public void render(GameContainer container, StateBasedGame stateBasedGame, Graphics graphics)throws SlickException {
 		
-		for (int i = 0; i < tables.size(); i++) { //Loop through all tables for rendering
-			Set<String> keys = tables.get(i).keySet(); //Get all keys in the table
+		//Loop through all tables for rendering
+		for (int i = 0; i < tables.size(); i++) {  
+			
+			//Get all keys in the table
+			Set<String> keys = tables.get(i).keySet();
 			
 			Color ch = null;
 			
+			//check what color we should color the current table
 			if (i == selectedHeader) {
 				ch = selectedColor;
 			} else {
@@ -97,7 +108,7 @@ public class Options extends BasicGameState {
 				
 				if (s.equals("header")) {
 					//Handle headers separately
-					header.drawString((i+1) * header.getWidth("MAX HEADER")/2 - header.getWidth(val), 30, val, ch);
+					header.drawString(50 + (i+1) * header.getWidth("MAX HEADER")/2 - header.getWidth(val), 30, val, ch);
 					if (i != selectedHeader) break; //End it here if we only need the header
 				} else {
 					
@@ -115,9 +126,10 @@ public class Options extends BasicGameState {
 					//Update the position
 					lastPos += item.getHeight() + 3;
 					
-					//In case the header wasen't first in the table
+					//Check if the string is to be drawn
 					if (i == selectedHeader) {
-						item.drawString(width/2, lastPos, s + ": " + val, ci);
+						String str = s + ": " + val;
+						item.drawString(width/2 - item.getWidth(str)/2, lastPos, str, ci);
 					}
 				}
 			}
@@ -140,6 +152,7 @@ public class Options extends BasicGameState {
 		Input input = container.getInput();
 		mouseX = Mouse.getX();
 		mouseY = Mouse.getY();
+		
 		if (input.isKeyPressed(Input.KEY_BACKSLASH)) {
 			Main.setDebugging(!debug);
 		/*} else if (input.isKeyPressed(Input.KEY_UP)) {
