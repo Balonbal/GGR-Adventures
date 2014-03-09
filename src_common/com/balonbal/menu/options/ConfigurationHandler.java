@@ -5,21 +5,24 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.Set;
 
+import com.balonbal.core.Logger;
 import com.balonbal.lib.Settings;
 import com.balonbal.lib.Strings;
 
 public class ConfigurationHandler {
 	
-	public Hashtable<String, String> configuration;
+	public HashMap<String, String> configuration;
 	
 	public void initialize() {
-		configuration = new Hashtable<String, String>();
+		configuration = new HashMap<String, String>();
 		
 		try {
+			createSettings();
 			load();
 		} catch(FileNotFoundException e) {
 			System.out.println("[SEVERE] No settings found. Creating from default.");
@@ -56,7 +59,7 @@ public class ConfigurationHandler {
 		Scanner scan = new Scanner(file);
 		
 		try {
-			configuration.put(Strings.FULLSCREEN_SETTING_STRING, scan.nextLine());
+			/*configuration.put(Strings.FULLSCREEN_SETTING_STRING, scan.nextLine());
 			configuration.put(Strings.WIDTH_SETTING_STRING, scan.nextLine());
 			configuration.put(Strings.HEIGHT_SETTING_STRING, scan.nextLine());
 			configuration.put(Strings.KEYBINDS_A_ENABLED, scan.nextLine());
@@ -73,7 +76,41 @@ public class ConfigurationHandler {
 			configuration.put(Strings.KEYBIND_B_RIGHT, scan.nextLine());
 			configuration.put(Strings.KEYBIND_B_LEFT, scan.nextLine());
 			configuration.put(Strings.KEYBIND_B_ATTACK, scan.nextLine());
-			configuration.put(Strings.KEYBIND_B_USE, scan.nextLine());
+			configuration.put(Strings.KEYBIND_B_USE, scan.nextLine());*/
+			
+			String cfg = "";
+			
+			while (scan.hasNext()) {
+				//Sort all lines of configuration to one string. Separate options with ";;"
+				cfg = cfg.concat(scan.nextLine() + ";;");
+			}
+			
+			Logger.log("Successfully loaded configuration from file.");
+			
+			Set<String> set = configuration.keySet();
+			HashMap<String, String> newConfig = new HashMap<String, String>();
+			
+			for (String s: set) {
+				Logger.log(s + " | " + cfg);
+				if (cfg.contains(s)) {
+					//Skin string to start with our option
+					String setting = cfg.substring(cfg.indexOf(s));
+					//And end at the next ";;"
+					setting = setting.substring(0, setting.indexOf(";;"));
+					
+					//Update the current setting to the loaded value
+					newConfig.put(s, setting.substring(setting.lastIndexOf(": ")+2));
+					
+					Logger.log(s + ": " + getSetting(s));
+				}
+			}
+			
+			Set<String> newSet = newConfig.keySet();
+			//Update the configuration map
+			for (String s: newSet) {
+				changeSetting(s, newConfig.get(s));
+			}
+			
 		} catch(NoSuchElementException e) {
 			System.out.println(file.getAbsolutePath() + " was corrupted, restoring default settings");
 			file.delete();
@@ -85,28 +122,25 @@ public class ConfigurationHandler {
 	}
 	
 	private void createSettings() {
-
-		System.out.println(Strings.FULLSCREEN_SETTING_STRING == null);
-		System.out.println(Settings.FULLSCREEN_DEFAULT);
 		
-		configuration.put(Strings.FULLSCREEN_SETTING_STRING, "" + Settings.FULLSCREEN_DEFAULT);
-		configuration.put(Strings.WIDTH_SETTING_STRING, "" + Settings.WIDTH_DEFAULT);
-		configuration.put(Strings.HEIGHT_SETTING_STRING, "" + Settings.HEIGHT_DEFAULT);
-		configuration.put(Strings.KEYBINDS_A_ENABLED, "" + Settings.ENABLED_A_DEFAULT);
-		configuration.put(Strings.KEYBIND_A_FORWARD, "" + Settings.MOVE_FORWARD_DEFAULT_A);
-		configuration.put(Strings.KEYBIND_A_BACK, Settings.MOVE_BACK_DEFAULT_A);
-		configuration.put(Strings.KEYBIND_A_RIGHT, Settings.MOVE_RIGHT_DEFAULT_A);
-		configuration.put(Strings.KEYBIND_A_LEFT, Settings.MOVE_LEFT_DEFAULT_A);
-		configuration.put(Strings.KEYBIND_A_ATTACK, Settings.ATTACK_DEFAULT_A);
-		configuration.put(Strings.KEYBIND_A_USE, Settings.USE_DEFAULT_A);
+		addSetting(Strings.FULLSCREEN_SETTING_STRING, "" + Settings.FULLSCREEN_DEFAULT);
+		addSetting(Strings.WIDTH_SETTING_STRING, "" + Settings.WIDTH_DEFAULT);
+		addSetting(Strings.HEIGHT_SETTING_STRING, "" + Settings.HEIGHT_DEFAULT);
+		addSetting(Strings.KEYBINDS_A_ENABLED, "" + Settings.ENABLED_A_DEFAULT);
+		addSetting(Strings.KEYBIND_A_FORWARD, "" + Settings.MOVE_FORWARD_DEFAULT_A);
+		addSetting(Strings.KEYBIND_A_BACK, Settings.MOVE_BACK_DEFAULT_A);
+		addSetting(Strings.KEYBIND_A_RIGHT, Settings.MOVE_RIGHT_DEFAULT_A);
+		addSetting(Strings.KEYBIND_A_LEFT, Settings.MOVE_LEFT_DEFAULT_A);
+		addSetting(Strings.KEYBIND_A_ATTACK, Settings.ATTACK_DEFAULT_A);
+		addSetting(Strings.KEYBIND_A_USE, Settings.USE_DEFAULT_A);
 		
-		configuration.put(Strings.KEYBINDS_B_ENABLED, "");
-		configuration.put(Strings.KEYBIND_B_FORWARD, "");
-		configuration.put(Strings.KEYBIND_B_BACK, "");
-		configuration.put(Strings.KEYBIND_B_RIGHT, "");
-		configuration.put(Strings.KEYBIND_B_LEFT, "");
-		configuration.put(Strings.KEYBIND_B_ATTACK, "");
-		configuration.put(Strings.KEYBIND_B_USE, "");
+		addSetting(Strings.KEYBINDS_B_ENABLED, "");
+		addSetting(Strings.KEYBIND_B_FORWARD, "");
+		addSetting(Strings.KEYBIND_B_BACK, "");
+		addSetting(Strings.KEYBIND_B_RIGHT, "");
+		addSetting(Strings.KEYBIND_B_LEFT, "");
+		addSetting(Strings.KEYBIND_B_ATTACK, "");
+		addSetting(Strings.KEYBIND_B_USE, "");
 		
 		saveSettings();
 	}
@@ -130,24 +164,11 @@ public class ConfigurationHandler {
 			FileWriter filestream = new FileWriter(settings);
 			BufferedWriter out = new BufferedWriter(filestream);
 			
-			out.write(configuration.get(Strings.FULLSCREEN_SETTING_STRING) + "\n");
-			out.write(configuration.get(Strings.WIDTH_SETTING_STRING) + "\n");
-			out.write(configuration.get(Strings.HEIGHT_SETTING_STRING) + "\n");
-			out.write(configuration.get(Strings.KEYBINDS_A_ENABLED) + "\n");
-			out.write(configuration.get(Strings.KEYBIND_A_FORWARD) + "\n");
-			out.write(configuration.get(Strings.KEYBIND_A_BACK) + "\n");
-			out.write(configuration.get(Strings.KEYBIND_A_RIGHT) + "\n");
-			out.write(configuration.get(Strings.KEYBIND_A_LEFT) + "\n");
-			out.write(configuration.get(Strings.KEYBIND_A_ATTACK) + "\n");
-			out.write(configuration.get(Strings.KEYBIND_A_USE) + "\n");
+			Set<String> set = configuration.keySet();
 			
-			out.write(configuration.get(Strings.KEYBINDS_B_ENABLED) + "\n");
-			out.write(configuration.get(Strings.KEYBIND_B_FORWARD) + "\n");
-			out.write(configuration.get(Strings.KEYBIND_B_BACK) + "\n");
-			out.write(configuration.get(Strings.KEYBIND_B_RIGHT) + "\n");
-			out.write(configuration.get(Strings.KEYBIND_B_LEFT) + "\n");
-			out.write(configuration.get(Strings.KEYBIND_B_ATTACK) + "\n");
-			out.write(configuration.get(Strings.KEYBIND_B_USE) + "\n");
+			for (String s: set) {
+				out.write(s + ": " + configuration.get(s) + "\n");
+			}
 			
 			//Close the file
 			out.close();
@@ -155,6 +176,21 @@ public class ConfigurationHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public void addSetting(String key, String defaultVal) {
+		configuration.put(key, defaultVal);
+	}
+	
+	public void changeSetting(String key, String newValue) {
+		if (configuration.containsKey(key)) {
+			configuration.remove(key);
+		}
+		configuration.put(key, newValue);
+	}
+	
+	public String getSetting(String key) {
+		return configuration.get(key);
 	}
 
 }
