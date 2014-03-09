@@ -142,6 +142,19 @@ public class Menu extends BasicGameState {
 				break;
 			}
 		}
+		if (Mouse.isButtonDown(0) && mouseOver != null) {
+			switch(mouseOver){
+			case "play":
+				//stateBasedGame.enterState(Reference.PLAY_MENU_STATE);
+				break;
+			case "options":
+				stateBasedGame.enterState(Reference.OPTIONS_STATE);
+				break;
+			case "quit":
+				System.exit(0);
+				break;
+			}
+		}
 		
 		if (input.isKeyPressed(Input.KEY_BACKSLASH)) {
 			Main.setDebugging(!debug);
