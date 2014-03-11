@@ -19,6 +19,7 @@ public class Strings {
 	public static final String FULLSCREEN_SETTING_STRING = "fullscreen";
 	public static final String WIDTH_SETTING_STRING = "width";
 	public static final String HEIGHT_SETTING_STRING = "height";
+	public static final String FRAMERATE_SETTING_STRING = "framerate_limit";
 	
 	public static final String KEYBINDS_A_ENABLED = "a_enabled";
 	public static final String KEYBINDS_B_ENABLED = "b_enabled";

@@ -14,8 +14,8 @@ import com.balonbal.lib.Reference;
 import com.balonbal.lib.Settings;
 import com.balonbal.lib.Strings;
 import com.balonbal.menu.Menu;
+import com.balonbal.menu.Options;
 import com.balonbal.menu.options.ConfigurationHandler;
-import com.balonbal.menu.options.Options;
 
 public class Main extends StateBasedGame {
 	

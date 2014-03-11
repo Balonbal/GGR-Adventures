@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -25,22 +24,25 @@ public class ConfigurationHandler {
 			createSettings();
 			load();
 		} catch(FileNotFoundException e) {
-			System.out.println("[SEVERE] No settings found. Creating from default.");
-			createSettings();
+			Logger.log(" No settings found. Using from default.");
 		}
 		
 		//Set all the settings TODO Improve this
 		Settings.fullscreen = configuration.get(Strings.FULLSCREEN_SETTING_STRING).equalsIgnoreCase("true");
 		Settings.width = Integer.parseInt(configuration.get(Strings.WIDTH_SETTING_STRING));
 		Settings.height = Integer.parseInt(configuration.get(Strings.HEIGHT_SETTING_STRING));
+		Settings.framerate = Integer.parseInt(configuration.get(Strings.FRAMERATE_SETTING_STRING));
+		
 		Settings.enabled_a = configuration.get(Strings.KEYBINDS_A_ENABLED).equalsIgnoreCase("true");
 		Settings.enabled_b = configuration.get(Strings.KEYBINDS_B_ENABLED).equalsIgnoreCase("true");
+		
 		Settings.attack_a = configuration.get(Strings.KEYBIND_A_ATTACK);
 		Settings.move_forward_a = configuration.get(Strings.KEYBIND_A_FORWARD);
 		Settings.move_back_a = configuration.get(Strings.KEYBIND_A_BACK);
 		Settings.move_left_a = configuration.get(Strings.KEYBIND_A_LEFT);
 		Settings.move_right_a = configuration.get(Strings.KEYBIND_A_RIGHT);
 		Settings.use_a = configuration.get(Strings.KEYBIND_A_USE);
+		
 		Settings.attack_b = configuration.get(Strings.KEYBIND_B_ATTACK);
 		Settings.move_forward_b = configuration.get(Strings.KEYBIND_B_FORWARD);
 		Settings.move_back_b = configuration.get(Strings.KEYBIND_B_BACK);
@@ -59,24 +61,6 @@ public class ConfigurationHandler {
 		Scanner scan = new Scanner(file);
 		
 		try {
-			/*configuration.put(Strings.FULLSCREEN_SETTING_STRING, scan.nextLine());
-			configuration.put(Strings.WIDTH_SETTING_STRING, scan.nextLine());
-			configuration.put(Strings.HEIGHT_SETTING_STRING, scan.nextLine());
-			configuration.put(Strings.KEYBINDS_A_ENABLED, scan.nextLine());
-			configuration.put(Strings.KEYBIND_A_FORWARD, scan.nextLine());
-			configuration.put(Strings.KEYBIND_A_BACK, scan.nextLine());
-			configuration.put(Strings.KEYBIND_A_RIGHT, scan.nextLine());
-			configuration.put(Strings.KEYBIND_A_LEFT, scan.nextLine());
-			configuration.put(Strings.KEYBIND_A_ATTACK, scan.nextLine());
-			configuration.put(Strings.KEYBIND_A_USE, scan.nextLine());
-		
-			configuration.put(Strings.KEYBINDS_B_ENABLED, scan.nextLine());
-			configuration.put(Strings.KEYBIND_B_FORWARD, scan.nextLine());
-			configuration.put(Strings.KEYBIND_B_BACK, scan.nextLine());
-			configuration.put(Strings.KEYBIND_B_RIGHT, scan.nextLine());
-			configuration.put(Strings.KEYBIND_B_LEFT, scan.nextLine());
-			configuration.put(Strings.KEYBIND_B_ATTACK, scan.nextLine());
-			configuration.put(Strings.KEYBIND_B_USE, scan.nextLine());*/
 			
 			String cfg = "";
 			
@@ -91,7 +75,6 @@ public class ConfigurationHandler {
 			HashMap<String, String> newConfig = new HashMap<String, String>();
 			
 			for (String s: set) {
-				Logger.log(s + " | " + cfg);
 				if (cfg.contains(s)) {
 					//Skin string to start with our option
 					String setting = cfg.substring(cfg.indexOf(s));
@@ -100,8 +83,6 @@ public class ConfigurationHandler {
 					
 					//Update the current setting to the loaded value
 					newConfig.put(s, setting.substring(setting.lastIndexOf(": ")+2));
-					
-					Logger.log(s + ": " + getSetting(s));
 				}
 			}
 			
@@ -111,8 +92,8 @@ public class ConfigurationHandler {
 				changeSetting(s, newConfig.get(s));
 			}
 			
-		} catch(NoSuchElementException e) {
-			System.out.println(file.getAbsolutePath() + " was corrupted, restoring default settings");
+		} catch(Exception e) {
+			Logger.log("SEVERE", file.getAbsolutePath() + " was corrupted, restoring default settings");
 			file.delete();
 			createSettings();
 		}
@@ -126,6 +107,8 @@ public class ConfigurationHandler {
 		addSetting(Strings.FULLSCREEN_SETTING_STRING, "" + Settings.FULLSCREEN_DEFAULT);
 		addSetting(Strings.WIDTH_SETTING_STRING, "" + Settings.WIDTH_DEFAULT);
 		addSetting(Strings.HEIGHT_SETTING_STRING, "" + Settings.HEIGHT_DEFAULT);
+		addSetting(Strings.FRAMERATE_SETTING_STRING, "" + Settings.FRAMERATE_DEFAULT);
+		
 		addSetting(Strings.KEYBINDS_A_ENABLED, "" + Settings.ENABLED_A_DEFAULT);
 		addSetting(Strings.KEYBIND_A_FORWARD, "" + Settings.MOVE_FORWARD_DEFAULT_A);
 		addSetting(Strings.KEYBIND_A_BACK, Settings.MOVE_BACK_DEFAULT_A);
