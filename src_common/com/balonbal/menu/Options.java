@@ -2,10 +2,6 @@ package com.balonbal.menu;
 
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -29,8 +25,8 @@ public class Options extends BasicGameState {
 	private int state;
 	private int width;
 	private int height;
-	private byte selectedHeader;
-	private String selectedItem;
+	private int selectedHeader;
+	private int selectedItem;
 	private ArrayList<OptionTab> options;
 	
 	//Fonts
@@ -55,23 +51,67 @@ public class Options extends BasicGameState {
 		width = gameContainer.getWidth();
 		height = gameContainer.getHeight();
 		
+		//Create a resolution array
+		Settings.initResolutions();
+		
 		//Set up the fonts we are going to use
 		Font header = new Font("Verdana", Font.BOLD, 20);
 		Font item = new Font("Verdana", Font.PLAIN, 12);
 		this.header = new TrueTypeFont(header, true);
 		this.item = new TrueTypeFont(item, true);
 		
-		//
+		//Create an arrayList for all the tabs in the menu
 		options = new ArrayList<OptionTab>();
-		OptionTab t = new OptionTab("Video");
-		t.addOption(new Option(Strings.FULLSCREEN_SETTING_STRING, "Fullscreen", Settings.fullscreen + "", 50, 70));
+		
+		//Create a video tab
+		OptionTab video = new OptionTab("Video");
+		video.addOption(new Option(Strings.FULLSCREEN_SETTING_STRING, "Fullscreen", new String[] {"true", "false"}, (Settings.fullscreen + ""), 0, 0));
+		video.addOption(new Option("resolution", "Resolution", Settings.AVAILABLE_RESOLUTIONS, Settings.width + "x" + Settings.height, 0, 0));
+		video.addOption(new Option(Strings.FRAMERATE_SETTING_STRING, "Framerate limit", intArrToStringArr(Settings.AVAILABLE_FRAMERATES), Settings.framerate + "", 0, 0));
+		options.add(video);
+		
+		setPositions();
 	}
 
 	@Override
 	public void render(GameContainer container, StateBasedGame stateBasedGame, Graphics graphics)throws SlickException {
 		
+		int headerX = 50;
+		
+		for (int i = 0; i < options.size(); i++) {
+			OptionTab tab = options.get(i);
+			
+			//Define the color to draw the header for this tab
+			Color headerColor = unselectedColor;
+			if (i == selectedHeader) {
+				headerColor = selectedColor;
+			}
+			
+			//Draw the header
+			header.drawString(headerX, 50, tab.getHeader(), headerColor);
+			//Move the xpos 
+			headerX += header.getWidth(tab.getHeader()) + 20;
+			
+			if (i == selectedHeader) {
+				 ArrayList<Option> options = tab.getOptions();
+				 for (int j = 0; j < options.size(); j++) {
+					 
+					 //Select the color for each item
+					 Color itemColor = unselectedColor;
+					 if (j == selectedItem) {
+						 itemColor = selectedColor;
+					 }
+					 
+					 //Get the current option to draw
+					 Option o = options.get(j);
+					 item.drawString(o.getX(), o.getY(), o.getDisplayName() + ": " + o.getValue(), itemColor);
+				}
+			}
+		}
+		
 		//Draw debug information
 		if (debug) {
+			//Draw mouse position
 			graphics.drawString("Mouse X: " + (mouseX < 0 ? "??" : mouseX) +
 					", Y: " + (mouseY < 0 ? "??" : mouseY), 10, 30);
 		}
@@ -116,6 +156,31 @@ public class Options extends BasicGameState {
 	@Override
 	public int getID() {
 		return state;
+	}
+	
+	public String[] intArrToStringArr(int[] arr) {
+		String[] r = new String[arr.length];
+		for (int i = 0; i < arr.length; i++) {
+			r[i] = arr[i] + "";
+		}
+		return r;
+	}
+	
+	public void setPositions() {
+		//Loop through all tabs
+		for (OptionTab tab: options) {
+			
+			//Get the options for each tab
+			ArrayList<Option> list = tab.getOptions();
+			int lastY = 100; //Keep track of y position, and start at 50
+			
+			//Loop through options and set their position
+			for (Option o: list) {
+				int xstart = width/2 - item.getWidth(o.getDisplayName() + ": " + o.getValue())/2;
+				o.move(xstart, lastY);
+				lastY += 10 + item.getHeight();
+			}
+		}
 	}
 
 }

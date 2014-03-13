@@ -20,7 +20,23 @@ public class Settings {
 		600,
 		1080
 	};
+	//NOTE: Those are not actually configs, they are only for display purposes
+	public static final String RESOLUTION_DEFAULT = WIDTH_DEFAULT + "x" + HEIGHT_DEFAULT;
+	public static String[] AVAILABLE_RESOLUTIONS = new String[AVAILABLE_WIDTHS.length];
+	
+	public static void initResolutions() {
+		for (int i = 0; i < AVAILABLE_WIDTHS.length; i++) {
+			AVAILABLE_RESOLUTIONS[i] = AVAILABLE_WIDTHS[i] + "x" + AVAILABLE_HEIGTHS[i];
+		}
+	}
+	
 	public static final int FRAMERATE_DEFAULT = -1;
+	public static final int[] AVAILABLE_FRAMERATES = {
+		-1,
+		30,
+		60,
+		120
+	};
 	
 	//Key bindings A 
 	

@@ -16,6 +16,10 @@ public class OptionTab {
 		options.add(option);
 	}
 	
+	public String getHeader() {
+		return header;
+	}
+	
 	public Option getOption(String ID) {
 		for (Option o: options) {
 			if (o.getID().equals(ID)) {
