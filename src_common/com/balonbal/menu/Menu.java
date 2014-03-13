@@ -3,7 +3,6 @@ package com.balonbal.menu;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
@@ -17,7 +16,6 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import com.balonbal.Main;
-import com.balonbal.core.Logger;
 import com.balonbal.core.ResourceManager;
 import com.balonbal.lib.Reference;
 import com.balonbal.lib.Strings;

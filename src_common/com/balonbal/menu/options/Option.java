@@ -1,7 +1,5 @@
 package com.balonbal.menu.options;
 
-import com.balonbal.core.Logger;
-
 public class Option {
 	
 	private String ID;
@@ -16,13 +14,14 @@ public class Option {
 		this.values = values;
 		this.xpos = xpos;
 		this.ypos = ypos;
+		value = 0;
+		
 		for (int i = 0; i < values.length; i++) {
-			if (values[i].equals(defaultVal)) {
+			if (values[i].equals(defaultVal) && values[i] != null) {
 				value = i;
 				break;
 			}
 		}
-		value = 0;
 		
 	}
 	

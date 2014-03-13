@@ -23,10 +23,15 @@ public class Settings {
 	//NOTE: Those are not actually configs, they are only for display purposes
 	public static final String RESOLUTION_DEFAULT = WIDTH_DEFAULT + "x" + HEIGHT_DEFAULT;
 	public static String[] AVAILABLE_RESOLUTIONS = new String[AVAILABLE_WIDTHS.length];
+	public static String[] AVAILABLE_KEYS = new String[127];
 	
 	public static void initResolutions() {
 		for (int i = 0; i < AVAILABLE_WIDTHS.length; i++) {
 			AVAILABLE_RESOLUTIONS[i] = AVAILABLE_WIDTHS[i] + "x" + AVAILABLE_HEIGTHS[i];
+		}
+		
+		for (int i = 0; i < 127; i++) {
+			AVAILABLE_KEYS[i] = String.valueOf((char) i);
 		}
 	}
 	
@@ -52,10 +57,10 @@ public class Settings {
 	public static String move_left_a;
 	
 	//Defaults
-	public static final String MOVE_FORWARD_DEFAULT_A = "W";
-	public static final String MOVE_BACK_DEFAULT_A = "S";
-	public static final String MOVE_RIGHT_DEFAULT_A = "D";
-	public static final String MOVE_LEFT_DEFAULT_A = "A";
+	public static final char MOVE_FORWARD_DEFAULT_A = 'w';
+	public static final char MOVE_BACK_DEFAULT_A = 's';
+	public static final char MOVE_RIGHT_DEFAULT_A = 'd';
+	public static final char MOVE_LEFT_DEFAULT_A = 'a';
 	
 	/*Interactions*/
 	public static String attack_a;
@@ -63,8 +68,8 @@ public class Settings {
 	
 	//Defaults
 	
-	public static final String ATTACK_DEFAULT_A = "MOUSE_LEFT";
-	public static final String USE_DEFAULT_A = "E";
+	public static final char ATTACK_DEFAULT_A = 'e';
+	public static final char USE_DEFAULT_A = 'q';
 	
 	//Key bindings B
 	
@@ -79,6 +84,5 @@ public class Settings {
 	/*Interactions*/
 	public static String attack_b;
 	public static String use_b;
-
 	
 }

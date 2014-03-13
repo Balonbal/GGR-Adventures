@@ -111,11 +111,11 @@ public class ConfigurationHandler {
 		
 		addSetting(Strings.KEYBINDS_A_ENABLED, "" + Settings.ENABLED_A_DEFAULT);
 		addSetting(Strings.KEYBIND_A_FORWARD, "" + Settings.MOVE_FORWARD_DEFAULT_A);
-		addSetting(Strings.KEYBIND_A_BACK, Settings.MOVE_BACK_DEFAULT_A);
-		addSetting(Strings.KEYBIND_A_RIGHT, Settings.MOVE_RIGHT_DEFAULT_A);
-		addSetting(Strings.KEYBIND_A_LEFT, Settings.MOVE_LEFT_DEFAULT_A);
-		addSetting(Strings.KEYBIND_A_ATTACK, Settings.ATTACK_DEFAULT_A);
-		addSetting(Strings.KEYBIND_A_USE, Settings.USE_DEFAULT_A);
+		addSetting(Strings.KEYBIND_A_BACK, String.valueOf(Settings.MOVE_BACK_DEFAULT_A));
+		addSetting(Strings.KEYBIND_A_RIGHT, String.valueOf(Settings.MOVE_RIGHT_DEFAULT_A));
+		addSetting(Strings.KEYBIND_A_LEFT, String.valueOf(Settings.MOVE_LEFT_DEFAULT_A));
+		addSetting(Strings.KEYBIND_A_ATTACK, String.valueOf(Settings.ATTACK_DEFAULT_A));
+		addSetting(Strings.KEYBIND_A_USE, String.valueOf(Settings.USE_DEFAULT_A));
 		
 		addSetting(Strings.KEYBINDS_B_ENABLED, "");
 		addSetting(Strings.KEYBIND_B_FORWARD, "");

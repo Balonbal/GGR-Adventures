@@ -2,6 +2,7 @@ package com.balonbal.menu;
 
 import java.awt.Font;
 import java.util.ArrayList;
+
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -13,6 +14,7 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import com.balonbal.Main;
+import com.balonbal.core.Logger;
 import com.balonbal.lib.Reference;
 import com.balonbal.lib.Settings;
 import com.balonbal.lib.Strings;
@@ -25,7 +27,7 @@ public class Options extends BasicGameState {
 	private int state;
 	private int width;
 	private int height;
-	private int selectedHeader;
+	private int selectedHeader = 2;
 	private int selectedItem;
 	private ArrayList<OptionTab> options;
 	
@@ -70,13 +72,44 @@ public class Options extends BasicGameState {
 		video.addOption(new Option(Strings.FRAMERATE_SETTING_STRING, "Framerate limit", intArrToStringArr(Settings.AVAILABLE_FRAMERATES), Settings.framerate + "", 0, 0));
 		options.add(video);
 		
+		//Create a audio tab
+		OptionTab audio = new OptionTab("Audio");
+		//TODO add audio options
+		options.add(audio);
+		
+		//Create a keybinds tab
+		OptionTab keyBinds = new OptionTab("Keybinds");
+		keyBinds.addOption(new Option(Strings.KEYBINDS_A_ENABLED, "Enable set A", new String[] { "true", "false" }, Settings.enabled_a+"", 0, 0));
+		keyBinds.addOption(new Option(Strings.KEYBINDS_B_ENABLED, "Enable set B", new String[] { "true", "false" }, Settings.enabled_b+"", 0, 0));
+		
+		keyBinds.addOption(new Option(Strings.NO_OPTION, " ", new String[] { " " }, " ", 0, 0));
+		keyBinds.addOption(new Option(Strings.NO_OPTION, "-- Keybinds A --", new String[] { " " }, " ", 0, 0));
+		
+		keyBinds.addOption(new Option(Strings.KEYBIND_A_FORWARD, "Move forward", Settings.AVAILABLE_KEYS, Settings.move_forward_a, 0, 0));
+		keyBinds.addOption(new Option(Strings.KEYBIND_A_BACK, "Move back", Settings.AVAILABLE_KEYS, Settings.move_back_a, 0, 0));
+		keyBinds.addOption(new Option(Strings.KEYBIND_A_RIGHT, "Move right", Settings.AVAILABLE_KEYS, Settings.move_forward_a, 0, 0));
+		keyBinds.addOption(new Option(Strings.KEYBIND_A_LEFT, "Move left", Settings.AVAILABLE_KEYS, Settings.move_left_a, 0, 0));
+		keyBinds.addOption(new Option(Strings.KEYBIND_A_ATTACK, "Attack", Settings.AVAILABLE_KEYS, Settings.attack_a, 0, 0));
+		keyBinds.addOption(new Option(Strings.KEYBIND_A_USE, "Interact", Settings.AVAILABLE_KEYS, Settings.use_a, 0, 0));
+		
+		keyBinds.addOption(new Option(Strings.NO_OPTION, " ", new String[] { " " }, " ", 0, 0));
+		keyBinds.addOption(new Option(Strings.NO_OPTION, "-- Keybinds B --", new String[] { " " }, " ", 0, 0));
+		
+		keyBinds.addOption(new Option(Strings.KEYBIND_B_FORWARD, "Move forward", Settings.AVAILABLE_KEYS, Settings.move_forward_b, 0, 0));
+		keyBinds.addOption(new Option(Strings.KEYBIND_B_BACK, "Move back", Settings.AVAILABLE_KEYS, Settings.move_back_b, 0, 0));
+		keyBinds.addOption(new Option(Strings.KEYBIND_B_RIGHT, "Move right", Settings.AVAILABLE_KEYS, Settings.move_forward_b, 0, 0));
+		keyBinds.addOption(new Option(Strings.KEYBIND_B_LEFT, "Move left", Settings.AVAILABLE_KEYS, Settings.move_left_b, 0, 0));
+		keyBinds.addOption(new Option(Strings.KEYBIND_B_ATTACK, "Attack", Settings.AVAILABLE_KEYS, Settings.attack_b, 0, 0));
+		keyBinds.addOption(new Option(Strings.KEYBIND_B_USE, "Interact", Settings.AVAILABLE_KEYS, Settings.use_b, 0, 0));
+		options.add(keyBinds);
+		
 		setPositions();
 	}
 
 	@Override
 	public void render(GameContainer container, StateBasedGame stateBasedGame, Graphics graphics)throws SlickException {
 		
-		int headerX = 50;
+		int headerX = width/4;
 		
 		for (int i = 0; i < options.size(); i++) {
 			OptionTab tab = options.get(i);
@@ -104,7 +137,17 @@ public class Options extends BasicGameState {
 					 
 					 //Get the current option to draw
 					 Option o = options.get(j);
-					 item.drawString(o.getX(), o.getY(), o.getDisplayName() + ": " + o.getValue(), itemColor);
+					 
+					 String name = o.getDisplayName();
+					 String val = o.getValue();
+					 if (o.getID().equals(Strings.FRAMERATE_SETTING_STRING) && val.equals("-1")) {
+						 val = "UNLIMITED";
+					 }
+					 if (o.getID().equals(Strings.NO_OPTION)) {
+						 item.drawString(o.getX(), o.getY(), name, Color.lightGray);
+					 } else {
+						 item.drawString(o.getX(), o.getY(), name + ": " + val, itemColor);
+					 }
 				}
 			}
 		}
@@ -128,25 +171,39 @@ public class Options extends BasicGameState {
 		
 		if (input.isKeyPressed(Input.KEY_BACKSLASH)) {
 			Main.setDebugging(!debug);
-		/*} else if (input.isKeyPressed(Input.KEY_UP)) {
-			selectedItem--;
+		} else if (input.isKeyPressed(Input.KEY_UP)) {
+			
+			//Go one up until it finds an option
+			do {
+				selectedItem--;
+			} while (selectedItem > 0 ? options.get(selectedHeader).getOptions().get(selectedItem).getID().equals(Strings.NO_OPTION) : false);
+			
+			//Start from the bottom if it reaches the top
 			if (selectedItem < 0) {
-				selected = 1;
+				selectedItem = options.get(selectedHeader).getOptions().size()-1;
 			}
 		} else if (input.isKeyPressed(Input.KEY_DOWN)) {
-			selected++;
-			if (selected > 1) {
-				selected = 0;
+			
+			int size = options.get(selectedHeader).getOptions().size();
+			
+			//Go one down until it finds an option
+			do {
+				selectedItem++;
+			} while (selectedItem < size ? options.get(selectedHeader).getOptions().get(selectedItem).getID().equals(Strings.NO_OPTION) : false);
+			
+			//If it reaches the end of the options, start from the top
+			if (selectedItem > size -1) {
+				selectedItem = 0;
 			}
 		} else if (input.isKeyPressed(Input.KEY_ENTER)) {
-			switch(selected) {
+			switch(selectedItem) {
 			case 0:
 				//stateBasedGame.enterState(Reference.PLAY_MENU_STATE);
 				break;
 			case 1:
 				stateBasedGame.enterState(Reference.OPTIONS_STATE);
 				break;
-			}*/
+			}
 		} else if (input.isKeyPressed(Input.KEY_ESCAPE)) {
 			stateBasedGame.enterState(Reference.MENU_STATE);
 		}

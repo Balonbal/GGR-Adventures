@@ -37,5 +37,6 @@ public class Strings {
 	public static final String KEYBIND_B_RIGHT = "b_right";
 	public static final String KEYBIND_B_ATTACK = "b_attack";
 	public static final String KEYBIND_B_USE = "b_use";
+	public static final String NO_OPTION = "no_option";
 
 }
