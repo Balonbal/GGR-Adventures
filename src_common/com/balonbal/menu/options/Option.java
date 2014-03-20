@@ -16,13 +16,31 @@ public class Option {
 		this.ypos = ypos;
 		value = 0;
 		
+		setValue(defaultVal);
+		
+	}
+	public void setValue(String s) {
 		for (int i = 0; i < values.length; i++) {
-			if (values[i].equals(defaultVal) && values[i] != null) {
+			if (values[i].equals(s) && values[i] != null) {
 				value = i;
 				break;
 			}
 		}
 		
+	}
+	
+	public void nextValue() {
+		value++;
+		if (value >= values.length) {
+			value = 0;
+		}
+	}
+	
+	public void prevValue() {
+		value--;
+		if (value < 0) {
+			value = values.length -1;
+		}
 	}
 	
 	public String getID() {

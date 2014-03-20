@@ -18,6 +18,7 @@ import com.balonbal.core.Logger;
 import com.balonbal.lib.Reference;
 import com.balonbal.lib.Settings;
 import com.balonbal.lib.Strings;
+import com.balonbal.menu.options.ConfigurationHandler;
 import com.balonbal.menu.options.Option;
 import com.balonbal.menu.options.OptionTab;
 
@@ -195,16 +196,14 @@ public class Options extends BasicGameState {
 			if (selectedItem > size -1) {
 				selectedItem = 0;
 			}
-		} else if (input.isKeyPressed(Input.KEY_ENTER)) {
-			switch(selectedItem) {
-			case 0:
-				//stateBasedGame.enterState(Reference.PLAY_MENU_STATE);
-				break;
-			case 1:
-				stateBasedGame.enterState(Reference.OPTIONS_STATE);
-				break;
-			}
+		} else if (input.isKeyPressed(Input.KEY_RIGHT)) {
+			//Shift the option one right
+			changeOption(selectedHeader, selectedItem, "+");
+		} else if (input.isKeyPressed(Input.KEY_LEFT)) {
+			//Shift the option one left
+			changeOption(selectedHeader, selectedItem, "-");
 		} else if (input.isKeyPressed(Input.KEY_ESCAPE)) {
+			saveOptions();
 			stateBasedGame.enterState(Reference.MENU_STATE);
 		}
 		
@@ -236,6 +235,27 @@ public class Options extends BasicGameState {
 				int xstart = width/2 - item.getWidth(o.getDisplayName() + ": " + o.getValue())/2;
 				o.move(xstart, lastY);
 				lastY += 10 + item.getHeight();
+			}
+		}
+	}
+	
+	private void changeOption(int head, int item, String mod) {
+		//get the option
+		Option opt = options.get(head).getOptions().get(item);
+		switch (mod) {
+		case "+":
+			opt.nextValue();
+			break;
+		case "-":
+			opt.prevValue();
+			break;
+		}
+	}
+	
+	private void saveOptions() {
+		for (OptionTab tab: options) {
+			for (Option o: tab.getOptions()) {
+				ConfigurationHandler.changeSetting(o.getID(), o.getValue());
 			}
 		}
 	}

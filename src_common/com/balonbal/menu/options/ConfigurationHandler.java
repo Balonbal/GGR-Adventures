@@ -15,7 +15,7 @@ import com.balonbal.lib.Strings;
 
 public class ConfigurationHandler {
 	
-	public HashMap<String, String> configuration;
+	public static HashMap<String, String> configuration;
 	
 	public void initialize() {
 		configuration = new HashMap<String, String>();
@@ -94,15 +94,21 @@ public class ConfigurationHandler {
 			
 		} catch(Exception e) {
 			Logger.log("SEVERE", file.getAbsolutePath() + " was corrupted, restoring default settings");
+			
+			//If something goes wrong, delete the file and create new ones from the defaults
 			file.delete();
 			createSettings();
+			saveSettings();
 		}
 		
 		//Close the file
 		scan.close();
+		saveSettings();
 	}
 	
 	private void createSettings() {
+		
+		//Add all our settings to the configuration map
 		
 		addSetting(Strings.FULLSCREEN_SETTING_STRING, "" + Settings.FULLSCREEN_DEFAULT);
 		addSetting(Strings.WIDTH_SETTING_STRING, "" + Settings.WIDTH_DEFAULT);
@@ -124,20 +130,18 @@ public class ConfigurationHandler {
 		addSetting(Strings.KEYBIND_B_LEFT, "");
 		addSetting(Strings.KEYBIND_B_ATTACK, "");
 		addSetting(Strings.KEYBIND_B_USE, "");
-		
-		saveSettings();
 	}
 	
-	private void saveSettings() {
+	private static void saveSettings() {
 		File settings = new File("test.txt");
 		
-		System.out.println("Using " + settings.getAbsolutePath() + " as settings");
+		Logger.log("CONFIG", "Using " + settings.getAbsolutePath() + " as settings");
 		
 		if (!settings.exists()) {
 			try {
 				settings.createNewFile();
 			} catch (Exception e) {
-				System.out.println("ERROR CREATING SAVEFILE!");
+				Logger.log("SEVERE", "ERROR CREATING SAVEFILE!");
 				
 			}
 		}
@@ -150,6 +154,7 @@ public class ConfigurationHandler {
 			Set<String> set = configuration.keySet();
 			
 			for (String s: set) {
+				Logger.log(s + " saved to value " + configuration.get(s));
 				out.write(s + ": " + configuration.get(s) + "\n");
 			}
 			
@@ -165,11 +170,18 @@ public class ConfigurationHandler {
 		configuration.put(key, defaultVal);
 	}
 	
-	public void changeSetting(String key, String newValue) {
-		if (configuration.containsKey(key)) {
+	public static void changeSetting(String key, String newValue) {
+		
+		//Check if the key exists, if so; remove it
+		if (configuration.containsKey(key) && !configuration.get(key).equals(newValue)) {
+			Logger.log("Removed: " + key);
 			configuration.remove(key);
 		}
+		//Put in the new value
 		configuration.put(key, newValue);
+		
+		//And save the settings
+		saveSettings();
 	}
 	
 	public String getSetting(String key) {
